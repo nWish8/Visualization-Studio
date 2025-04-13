@@ -1,0 +1,9 @@
+moderngl
+moderngl-window
+numpy
+sounddevice
+librosa
+# pyrr            # For camera math (view/projection matrices)
+# mido            # MIDI input support
+# python-rtmidi   # MIDI device backend
+# pyglet or glfw  # Alternative windowing systems if needed
