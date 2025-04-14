@@ -1,8 +1,9 @@
-moderngl
-moderngl-window
-numpy
-sounddevice
-librosa
+moderngl>=5.12.0
+moderngl-window>=2.4.4
+numpy>=1.26.4
+sounddevice>=0.4.6
+librosa>=0.10.1
+
 # pyrr            # For camera math (view/projection matrices)
 # mido            # MIDI input support
 # python-rtmidi   # MIDI device backend
