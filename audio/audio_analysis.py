@@ -22,10 +22,10 @@ class AudioAnalyzer:
     def audio_callback(self, indata, frames, time, status):
         if status:
             print("[Audio Warning]", status)
-        samples = indata[:, 0]  # use first channel for mono input
+        samples = indata[:, 0]  # Use first channel (mono)
         with self.lock:
             self.latest_samples = samples.copy()
-            # Compute Mel spectrogram on the current chunk
+            # Compute the Mel spectrogram for the current buffer
             mel = librosa.feature.melspectrogram(
                 y=samples.astype(np.float32),
                 sr=self.sample_rate,
@@ -33,10 +33,10 @@ class AudioAnalyzer:
                 n_mels=self.mel_bands,
                 fmax=self.sample_rate / 2
             )
-            # Convert power spectrogram to decibels, then normalize to [0,1]
+            # Convert to decibels and normalize to [0,1]
             mel_db = librosa.power_to_db(mel, ref=np.max)
             mel_norm = (mel_db - np.min(mel_db)) / (np.max(mel_db) - np.min(mel_db) + 1e-6)
-            # Use the latest time slice (last column)
+            # Use the latest column of the Mel spectrogram
             self.latest_mel = mel_norm[:, -1]
 
     def start(self):
@@ -49,7 +49,7 @@ class AudioAnalyzer:
         with self.lock:
             return self.latest_mel.copy()
 
-# Global analyzer instance for convenience
+# Global instance for convenience.
 audio_analyzer = None
 
 def initialize_audio(sample_rate=44100, frame_size=1024, mel_bands=64):
