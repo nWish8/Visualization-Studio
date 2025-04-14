@@ -10,7 +10,7 @@ The long-term plan includes support for **MIDI input** as an additional or alter
 ## Core Features
 
 ### 🎛️ Audio-Driven Grid
-- A **2D grid mesh** in the XZ plane, animated via **Y-axis displacement** based on real-time audio analysis.
+- A **3D grid mesh** in the XZ plane, animated via **Y-axis displacement** based on real-time audio analysis.
 - Audio features like **amplitude**, **frequency bands**, and **beat pulses** will control mesh deformation and color.
 - Mesh updates and visual effects are handled on the **GPU** via custom **GLSL shaders**.
 

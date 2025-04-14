@@ -1,20 +1,26 @@
 #version 330
 
-// Uniform declarations (must match exactly between vertex and fragment shaders)
-uniform vec2 resolution;         // Added: resolution is now a vec2 in both shaders.
-uniform sampler1D audio_texture;
 uniform float time;
+uniform sampler1D audio_texture;
 
 in vec3 in_position;
+out float vHeight;
+out vec3 vColor;
 
 void main() {
-    // Convert the x coordinate from [-1,1] to [0,1] for texture sampling.
     float u = (in_position.x + 1.0) / 2.0;
+    float v = (in_position.z + 1.0) / 2.0;
+
     float audio_val = texture(audio_texture, u).r;
 
+    float wave = sin((in_position.x + time) * 4.0) * 0.1;
+    float ripple = sin((in_position.z - time * 0.3) * 8.0) * 0.1;
+
     vec3 pos = in_position;
-    // Displace vertex in Y by combining audio value and a time–based sine modulation.
-    pos.y += audio_val * 0.5 * sin(time * 2.0 + in_position.z * 3.1415);
+    pos.y += audio_val * 0.4 + wave + ripple;
 
     gl_Position = vec4(pos, 1.0);
+
+    vHeight = pos.y;
+    vColor = vec3(audio_val, v, 1.0 - u);
 }
