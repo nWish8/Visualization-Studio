@@ -1,4 +1,5 @@
 #version 330
+uniform float time;
 
 out vec4 fragColor;
 

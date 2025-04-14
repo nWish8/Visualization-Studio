@@ -40,10 +40,13 @@ class CymaticVisualizer(mglw.WindowConfig):
         with open("shaders/grid.frag") as f:
             fragment_shader = f.read()
 
-        self.program = self.ctx.program(
-            vertex_shader=vertex_shader,
-            fragment_shader=fragment_shader,
-        )
+        try:
+            self.program = self.ctx.program(
+                vertex_shader=vertex_shader,
+                fragment_shader=fragment_shader,
+            )
+        except Exception as e:
+            print("Shader compilation error:", e)
 
         self.program['resolution'].value = self.grid_res
 
@@ -55,24 +58,24 @@ class CymaticVisualizer(mglw.WindowConfig):
 
         # Audio texture (1D)
         self.audio_data = np.zeros(self.grid_res, dtype='f4')
-        self.audio_texture = self.ctx.texture((self.grid_res,1), 1, self.audio_data.tobytes())
+        self.audio_texture = self.ctx.texture((self.grid_res, 1), 1, self.audio_data.tobytes(), dtype='f4')
         self.audio_texture.filter = (moderngl.LINEAR, moderngl.LINEAR)
         self.program['audio_texture'] = 0
 
         self.time = 0.0
 
-    def render(self, time: float, frame_time: float):
+    def on_render(self, time: float, frame_time: float):
         self.ctx.clear(0.0, 0.0, 0.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
-
+    
         self.time = time
         self.program['time'].value = self.time
-
+    
         # Update mel band data
         self.audio_data = get_mel_bands(self.grid_res)
         self.audio_texture.write(self.audio_data.tobytes())
         self.audio_texture.use(location=0)
-
+    
         # Draw grid
         self.vao.render()
 
