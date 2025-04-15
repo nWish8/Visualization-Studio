@@ -8,20 +8,28 @@ input_device_indices = [i for i, d in enumerate(all_devices) if d['max_input_cha
 current_device_index = 0
 stream = None
 
-def initialize_audio(device_index=0, sample_rate=44100, frame_size=1024, mel_bands=1024):
-    global stream, current_device_index
-    current_device_index = device_index
+def get_stereo_mix_index():
+    devices = sd.query_devices()
+    for i, device in enumerate(devices):
+        if "Stereo Mix" in device['name'] and device['max_input_channels'] > 0:
+            return i
+    return None  # fallback if not found
 
-    def callback(indata, frames, time, status):
-        global last_audio_frame
-        last_audio_frame = np.copy(indata[:, 0])
+def initialize_audio(sample_rate=44100, frame_size=1024, mel_bands=64):
+    device_index = get_stereo_mix_index()
+
+    if device_index is not None:
+        print(f"✅ Auto-selected loopback device: {device_index} - {sd.query_devices(device_index)['name']}")
+    else:
+        print("⚠️ Stereo Mix not found, using default input device")
+        device_index = None  # fallback to system default
 
     stream = sd.InputStream(
-        callback=callback,
+        device=device_index,
+        channels=1,
         samplerate=sample_rate,
         blocksize=frame_size,
-        device=device_index,
-        channels=1
+        callback=,
     )
     stream.start()
 

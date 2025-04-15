@@ -12,15 +12,11 @@ class GridRenderer:
         self._create_spectrum_texture()
 
     def _create_program(self):
-        # Load shaders
-        vertex_src = Path("shaders/vertex_shader.glsl").read_text()
-        fragment_src = Path("shaders/fragment_shader.glsl").read_text()
         self.program = self.ctx.program(
-            vertex_shader=vertex_src,
-            fragment_shader=fragment_src,
+            vertex_shader=Path("shaders/grid_shader.glsl").read_text(),
+            varyings=["out_color"],  # if using transform feedback (optional)
         )
-        # Assign constant values to uniforms
-        self.program['height_scale'].value = self.height_scale
+
 
     def _create_geometry(self):
         # Generate a flat grid of points on the XZ plane
