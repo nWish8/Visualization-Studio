@@ -1,10 +1,11 @@
 #version 330
 
-in float vHeight;
-in vec3 vColor;
-out vec4 fragColor;
+uniform float time;
+
+
+in vec3 vColor;          // Interpolated color from vertex shader
+out vec4 fragColor;      // Final pixel color
 
 void main() {
-    float brightness = smoothstep(-0.1, 0.5, vHeight);
-    fragColor = vec4(vColor * brightness, 1.0);
+    fragColor = vec4(vColor, 1.0);  // Opaque fragment output
 }

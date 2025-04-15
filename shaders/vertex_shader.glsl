@@ -1,26 +1,28 @@
 #version 330
 
-uniform float time;
-uniform sampler1D audio_texture;
+uniform mat4 projection;             // Projection matrix (perspective)
+uniform mat4 view;                   // View matrix (camera)
+uniform float time;                  // Time for animations (not currently used)
+uniform float height_scale;          // Controls how high the terrain displaces
+uniform sampler1D spectrum;          // 1D texture containing audio spectrum data
 
-in vec3 in_position;
-out float vHeight;
-out vec3 vColor;
+in vec3 in_position;                 // Incoming vertex position
+out vec3 vColor;                     // Output color to fragment shader
 
 void main() {
-    float u = (in_position.x + 1.0) / 2.0;
-    float v = (in_position.z + 1.0) / 2.0;
+    // Compute radial distance from origin (used to sample spectrum texture)
+    float u = length(in_position.xz);
 
-    float audio_val = texture(audio_texture, u).r;
+    // Sample audio intensity from spectrum texture using distance as UV
+    float audio = texture(spectrum, clamp(u, 0.0, 1.0)).r;
 
-    float wave = sin((in_position.x + time) * 4.0) * 0.1;
-    float ripple = sin((in_position.z - time * 0.3) * 8.0) * 0.1;
-
+    // Displace vertex along Y based on spectrum value and height scale
     vec3 pos = in_position;
-    pos.y += audio_val * 0.4 + wave + ripple;
+    pos.y += audio * height_scale;
 
-    gl_Position = vec4(pos, 1.0);
+    // Transform vertex position to clip space
+    gl_Position = projection * view * vec4(pos, 1.0);
 
-    vHeight = pos.y;
-    vColor = vec3(audio_val, v, 1.0 - u);
+    // Set vertex color based on audio intensity
+    vColor = vec3(audio * 0.8, 0.5 * audio, 1.0 - audio);
 }
